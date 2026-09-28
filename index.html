@@ -3,249 +3,323 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Canada Health Budget Simulator — Tutorial Facilitation Tool</title>
+  <title>Canada Health Budget Simulator — Taskforce Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      --bg-main: #0f172a;
-      --panel-bg: #1e293b;
-      --panel-border: #334155;
-      --red-accent: #ef4444;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; padding: 20px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 800px; }
-
-    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px; margin-bottom: 24px; }
-    h1 { font-size: 1.5rem; color: var(--red-accent); }
-    .subhead { font-size: 0.875rem; color: var(--text-muted); }
-
-    .btn { background: var(--red-accent); color: white; border: none; padding: 12px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 1rem; transition: background 0.2s; }
-    .btn:hover { background: #dc2626; }
-    .btn-secondary { background: #475569; margin-top: 16px; }
-    .btn-secondary:hover { background: #334155; }
-    .btn-bench { background: rgba(217, 119, 6, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.5); padding: 8px 12px; font-size: 0.85rem; width: auto; }
-    .btn-bench:hover { background: rgba(217, 119, 6, 0.4); }
-
-    .card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
-    .benchmark-box { background: rgba(120, 53, 15, 0.3); border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin-bottom: 20px; color: #fef3c7; display: none; }
-
-    .field { margin-bottom: 20px; }
-    label { display: block; font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
-    input[type="text"] { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--panel-border); border-radius: 6px; color: white; font-size: 1rem; }
-
-    .slider-row { background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 12px; }
-    .slider-header { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
-    .slider-val { font-weight: bold; color: var(--red-accent); }
-    input[type="range"] { width: 100%; accent-color: var(--red-accent); cursor: pointer; }
-
-    .budget-status { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 16px; padding: 12px; background: #0f172a; border-radius: 6px; }
-    .valid { color: #4ade80; }
-    .invalid { color: #f59e0b; }
-
-    .score-badge { font-size: 2.5rem; font-weight: 900; color: var(--red-accent); line-height: 1; }
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
-    .stat-card { background: #0f172a; padding: 16px; border-radius: 8px; text-align: center; }
-    .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-    .stat-val { font-size: 1.25rem; font-weight: bold; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-red-500 selection:text-white">
 
-<div class="container">
-  <header>
-    <div>
-      <h1>🇨🇦 Canada Health Budget Simulator</h1>
-      <div class="subhead">10-Year Master Strategy Model ($500B CAD Total)</div>
+  <!-- Header Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-red-600/20 border border-red-500/40 p-2 rounded-xl text-red-500 font-bold text-xl">
+          🇨🇦
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-white tracking-tight">Canada Health Budget Simulator</h1>
+          <p class="text-xs text-slate-400 font-medium">10-Year Master Allocation Model ($500B CAD Envelope)</p>
+        </div>
+      </div>
+
+      <button 
+        onclick="toggleBenchmark()" 
+        class="inline-flex items-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        Facilitator: Reveal Benchmark
+      </button>
     </div>
-    <button class="btn btn-bench" onclick="toggleBenchmark()">Facilitator: Reveal Benchmark</button>
   </header>
 
-  <div id="benchmarkBox" class="benchmark-box">
-    <h3 style="color:#fbbf24; margin-bottom:8px;">💡 Facilitator Optimal Strategy ($500B Total):</h3>
-    <ul style="margin-left: 20px; line-height: 1.6; font-size: 0.9rem;">
-      <li><strong>1. Lack of Places After ER (Post-Acute/LTC):</strong> $175B (35%) — Clears ALC bed-blocking</li>
-      <li><strong>2. Medically Complex Inflow (Community Care):</strong> $125B (25%) — Suppresses ER high-utilizers</li>
-      <li><strong>3. Doctor Shortage & Primary Care:</strong> $125B (25%) — Compounding long-term stability</li>
-      <li><strong>4. Lack of Hospital Space (Acute Care):</strong> $75B (15%) — Prevents over-building acute beds</li>
-    </ul>
-  </div>
+  <main class="max-w-5xl mx-auto px-4 py-8">
 
-  <!-- INPUT FORM -->
-  <div id="inputForm" class="card">
-    <div class="field">
-      <label for="groupName">Group / Team Name</label>
-      <input type="text" id="groupName" value="Group 1" />
-    </div>
-
-    <div class="budget-status">
-      <span>Total Budget Allocation:</span>
-      <span id="budgetText" class="valid">$500B / $500B CAD</span>
-    </div>
-
-    <div class="slider-row">
-      <div class="slider-header">
-        <span>1. Lack of Places After ER (Post-Acute / LTC)</span>
-        <span class="slider-val" id="val-postEr">$125B</span>
+    <!-- Facilitator Benchmark Modal Box -->
+    <div id="benchmarkBox" class="hidden mb-8 bg-amber-950/40 border border-amber-500/30 rounded-2xl p-6 text-amber-200 shadow-xl relative overflow-hidden backdrop-blur-sm">
+      <div class="absolute -right-8 -bottom-8 opacity-10 text-amber-400">
+        <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg>
       </div>
-      <input type="range" id="postEr" min="0" max="300" step="5" value="125" oninput="updateBudget()" />
-    </div>
-
-    <div class="slider-row">
-      <div class="slider-header">
-        <span>2. Medically Complex Inflow (Community Care)</span>
-        <span class="slider-val" id="val-complex">$125B</span>
-      </div>
-      <input type="range" id="complex" min="0" max="300" step="5" value="125" oninput="updateBudget()" />
-    </div>
-
-    <div class="slider-row">
-      <div class="slider-header">
-        <span>3. Doctor Shortage & Primary Care</span>
-        <span class="slider-val" id="val-doctor">$125B</span>
-      </div>
-      <input type="range" id="doctor" min="0" max="300" step="5" value="125" oninput="updateBudget()" />
-    </div>
-
-    <div class="slider-row">
-      <div class="slider-header">
-        <span>4. Lack of Hospital Space (Acute Care)</span>
-        <span class="slider-val" id="val-hospital">$125B</span>
-      </div>
-      <input type="range" id="hospital" min="0" max="300" step="5" value="125" oninput="updateBudget()" />
-    </div>
-
-    <button class="btn" style="margin-top: 10px;" onclick="runSimulation()">Run 10-Year Simulation</button>
-  </div>
-
-  <!-- RESULTS SCREEN -->
-  <div id="resultsCard" class="card" style="display: none;">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--panel-border); padding-bottom:16px;">
-      <div>
-        <h2 id="resGroupName" style="font-size:1.25rem;">Auditor General Report</h2>
-        <div class="subhead">10-Year System Performance Evaluation</div>
-      </div>
-      <div style="text-align:right;">
-        <div class="score-badge" id="resScore">0</div>
-        <div style="font-size:0.85rem; font-weight:bold;" id="resGrade">Grade: F</div>
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 text-amber-400 font-bold text-base mb-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Optimal Benchmark Strategy ($500B CAD Total Allocation)
+        </div>
+        <div class="grid md:grid-cols-2 gap-4 mt-4 text-xs font-medium">
+          <div class="bg-amber-900/30 border border-amber-500/20 p-3 rounded-xl">
+            <span class="text-amber-300 font-bold block mb-1">1. Post-ER Places (35% / $175B)</span>
+            Solves the ALC bed-blocking crisis. Frees up existing acute hospital beds at a fraction of construction costs.
+          </div>
+          <div class="bg-amber-900/30 border border-amber-500/20 p-3 rounded-xl">
+            <span class="text-amber-300 font-bold block mb-1">2. Medically Complex Patients (25% / $125B)</span>
+            Proactive community care deflects high-utilizers before they hit emergency room doors.
+          </div>
+          <div class="bg-amber-900/30 border border-amber-500/20 p-3 rounded-xl">
+            <span class="text-amber-300 font-bold block mb-1">3. Doctor Shortage & Primary Care (25% / $125B)</span>
+            Builds compounding primary care stability and reduces physician burnout across 10 years.
+          </div>
+          <div class="bg-amber-900/30 border border-amber-500/20 p-3 rounded-xl">
+            <span class="text-amber-300 font-bold block mb-1">4. Hospital Space (15% / $75B)</span>
+            Maintains acute infrastructure without over-investing in physical beds that get clogged by ALC patients.
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Avg ER Wait</div>
-        <div class="stat-val" id="resErWait">0 hrs</div>
+    <!-- MAIN ALLOCATION FORM -->
+    <div id="inputForm" class="space-y-6">
+      
+      <!-- Group Info Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <label for="groupName" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Group / Team Name</label>
+        <input 
+          type="text" 
+          id="groupName" 
+          value="Group 1" 
+          class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white font-medium focus:outline-none focus:border-red-500 transition-colors"
+          placeholder="Enter team or student names..."
+        />
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Bed-Blocking (ALC)</div>
-        <div class="stat-val" id="resAlc">0%</div>
+
+      <!-- Budget Tracker Banner -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-wrap justify-between items-center gap-4">
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Envelope Balance</span>
+          <div id="budgetText" class="text-2xl font-black text-amber-400">$0B / $500B CAD</div>
+        </div>
+        <div id="budgetProgressWrapper" class="w-full md:w-64 bg-slate-950 rounded-full h-3 border border-slate-800 overflow-hidden">
+          <div id="progressBar" class="bg-amber-500 h-full w-0 transition-all duration-300"></div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">MD Burnout Rate</div>
-        <div class="stat-val" id="resBurnout">0%</div>
+
+      <!-- Allocation Sliders Grid -->
+      <div class="grid md:grid-cols-2 gap-6">
+
+        <!-- Issue 1 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4 hover:border-slate-700 transition-colors">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-2">
+              <span class="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md">Issue 1</span>
+              <span class="text-xl font-black text-white" id="val-postEr">$0B</span>
+            </div>
+            <h3 class="font-bold text-slate-100 text-base mb-1">Lack of Places to Go After Leaving ER</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Funding long-term care (LTC), home rehabilitation, and post-acute facilities to clear hospital bed-blocking.</p>
+          </div>
+          <div>
+            <input type="range" id="postEr" min="0" max="300" step="5" value="0" oninput="updateBudget()" class="w-full accent-red-500 cursor-pointer h-2 bg-slate-950 rounded-lg" />
+          </div>
+        </div>
+
+        <!-- Issue 2 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4 hover:border-slate-700 transition-colors">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-2">
+              <span class="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md">Issue 2</span>
+              <span class="text-xl font-black text-white" id="val-complex">$0B</span>
+            </div>
+            <h3 class="font-bold text-slate-100 text-base mb-1">Inability to Control Complex Patients</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Specialized community care, chronic disease teams, and outreach for high-utilizer complex patients.</p>
+          </div>
+          <div>
+            <input type="range" id="complex" min="0" max="300" step="5" value="0" oninput="updateBudget()" class="w-full accent-red-500 cursor-pointer h-2 bg-slate-950 rounded-lg" />
+          </div>
+        </div>
+
+        <!-- Issue 3 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4 hover:border-slate-700 transition-colors">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-2">
+              <span class="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md">Issue 3</span>
+              <span class="text-xl font-black text-white" id="val-doctor">$0B</span>
+            </div>
+            <h3 class="font-bold text-slate-100 text-base mb-1">Doctor Shortage & Primary Care</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Medical school expansion, fast-tracking international trained physicians, and team-based primary care clinics.</p>
+          </div>
+          <div>
+            <input type="range" id="doctor" min="0" max="300" step="5" value="0" oninput="updateBudget()" class="w-full accent-red-500 cursor-pointer h-2 bg-slate-950 rounded-lg" />
+          </div>
+        </div>
+
+        <!-- Issue 4 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4 hover:border-slate-700 transition-colors">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-2">
+              <span class="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md">Issue 4</span>
+              <span class="text-xl font-black text-white" id="val-hospital">$0B</span>
+            </div>
+            <h3 class="font-bold text-slate-100 text-base mb-1">Lack of Hospital Space</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Building new acute hospital wings, emergency department expansions, and modern surgical suites.</p>
+          </div>
+          <div>
+            <input type="range" id="hospital" min="0" max="300" step="5" value="0" oninput="updateBudget()" class="w-full accent-red-500 cursor-pointer h-2 bg-slate-950 rounded-lg" />
+          </div>
+        </div>
+
       </div>
+
+      <!-- Run Action Button -->
+      <button 
+        onclick="runSimulation()" 
+        class="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-2xl shadow-lg shadow-red-600/20 transition-all text-base flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        Execute 10-Year Simulation
+      </button>
+
     </div>
 
-    <div style="background:#0f172a; padding:16px; border-radius:8px; font-size:0.9rem; line-height:1.5; color:#cbd5e1; margin-bottom:16px;">
-      <strong>Auditor General Summary Finding:</strong>
-      <p id="resAuditText" style="margin-top:6px;"></p>
+    <!-- RESULTS REPORT CARD -->
+    <div id="resultsCard" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-8">
+      
+      <!-- Report Header -->
+      <div class="flex flex-wrap justify-between items-start gap-4 border-b border-slate-800 pb-6">
+        <div>
+          <span class="text-xs font-bold text-red-500 uppercase tracking-widest block mb-1">Auditor General Report</span>
+          <h2 id="resGroupName" class="text-2xl font-black text-white">Evaluation Findings</h2>
+          <p class="text-xs text-slate-400 mt-1">10-Year Systemic Health Outcome Summary</p>
+        </div>
+        <div class="text-right bg-slate-950 border border-slate-800 px-5 py-3 rounded-2xl">
+          <div class="text-4xl font-black text-red-500" id="resScore">0<span class="text-sm font-semibold text-slate-500">/100</span></div>
+          <div class="text-xs font-bold text-slate-300 mt-0.5" id="resGrade">Grade: F</div>
+        </div>
+      </div>
+
+      <!-- Key Health Metrics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-950 border border-slate-800/80 p-4 rounded-xl text-center">
+          <div class="text-xs text-slate-400 font-semibold mb-1">Avg ER Wait Time</div>
+          <div class="text-2xl font-bold text-white" id="resErWait">0 hrs</div>
+        </div>
+        <div class="bg-slate-950 border border-slate-800/80 p-4 rounded-xl text-center">
+          <div class="text-xs text-slate-400 font-semibold mb-1">Bed-Blocking (ALC)</div>
+          <div class="text-2xl font-bold text-white" id="resAlc">0%</div>
+        </div>
+        <div class="bg-slate-950 border border-slate-800/80 p-4 rounded-xl text-center">
+          <div class="text-xs text-slate-400 font-semibold mb-1">MD Burnout Rate</div>
+          <div class="text-2xl font-bold text-white" id="resBurnout">0%</div>
+        </div>
+      </div>
+
+      <!-- Auditor General Insight -->
+      <div class="bg-slate-950 border border-slate-800 p-6 rounded-2xl space-y-2">
+        <div class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Audit Summary Finding
+        </div>
+        <p id="resAuditText" class="text-sm text-slate-300 leading-relaxed"></p>
+      </div>
+
+      <!-- Back Button -->
+      <button 
+        onclick="resetForm()" 
+        class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
+        ← Return to Allocation Panel (Test Next Group)
+      </button>
+
     </div>
 
-    <button class="btn btn-secondary" onclick="resetForm()">← Test Another Group Allocation</button>
-  </div>
-</div>
+  </main>
 
-<script>
-  function updateBudget() {
-    const postEr = parseInt(document.getElementById('postEr').value);
-    const complex = parseInt(document.getElementById('complex').value);
-    const doctor = parseInt(document.getElementById('doctor').value);
-    const hospital = parseInt(document.getElementById('hospital').value);
+  <script>
+    function updateBudget() {
+      const postEr = parseInt(document.getElementById('postEr').value) || 0;
+      const complex = parseInt(document.getElementById('complex').value) || 0;
+      const doctor = parseInt(document.getElementById('doctor').value) || 0;
+      const hospital = parseInt(document.getElementById('hospital').value) || 0;
 
-    document.getElementById('val-postEr').innerText = '$' + postEr + 'B';
-    document.getElementById('val-complex').innerText = '$' + complex + 'B';
-    document.getElementById('val-doctor').innerText = '$' + doctor + 'B';
-    document.getElementById('val-hospital').innerText = '$' + hospital + 'B';
+      document.getElementById('val-postEr').innerText = '$' + postEr + 'B';
+      document.getElementById('val-complex').innerText = '$' + complex + 'B';
+      document.getElementById('val-doctor').innerText = '$' + doctor + 'B';
+      document.getElementById('val-hospital').innerText = '$' + hospital + 'B';
 
-    const total = postEr + complex + doctor + hospital;
-    const bText = document.getElementById('budgetText');
-    bText.innerText = '$' + total + 'B / $500B CAD';
+      const total = postEr + complex + doctor + hospital;
+      const bText = document.getElementById('budgetText');
+      const progressBar = document.getElementById('progressBar');
 
-    if (total === 500) {
-      bText.className = 'valid';
-    } else {
-      bText.className = 'invalid';
+      bText.innerText = '$' + total + 'B / $500B CAD';
+
+      const percent = Math.min(100, (total / 500) * 100);
+      progressBar.style.width = percent + '%';
+
+      if (total === 500) {
+        bText.className = 'text-2xl font-black text-emerald-400';
+        progressBar.className = 'bg-emerald-500 h-full transition-all duration-300';
+      } else if (total > 500) {
+        bText.className = 'text-2xl font-black text-rose-500';
+        progressBar.className = 'bg-rose-500 h-full transition-all duration-300';
+      } else {
+        bText.className = 'text-2xl font-black text-amber-400';
+        progressBar.className = 'bg-amber-500 h-full transition-all duration-300';
+      }
     }
-  }
 
-  function toggleBenchmark() {
-    const box = document.getElementById('benchmarkBox');
-    box.style.display = box.style.display === 'block' ? 'none' : 'block';
-  }
-
-  function runSimulation() {
-    const groupName = document.getElementById('groupName').value || "Group";
-    const postEr = parseInt(document.getElementById('postEr').value);
-    const complex = parseInt(document.getElementById('complex').value);
-    const doctor = parseInt(document.getElementById('doctor').value);
-    const hospital = parseInt(document.getElementById('hospital').value);
-
-    // Scoring Math based on systemic targets:
-    // Optimal targets: Post-ER=175B (35pts), Complex=125B (25pts), Doctor=125B (25pts), Hospital=75B (15pts)
-    const s1 = Math.min(35, (postEr / 175) * 35);
-    const s2 = Math.min(25, (complex / 125) * 25);
-    const s3 = Math.min(25, (doctor / 125) * 25);
-    const s4 = Math.min(15, (hospital / 75) * 15);
-
-    // Apply penalty if total allocation exceeds or falls short of $500B budget limit
-    const totalAllocated = postEr + complex + doctor + hospital;
-    const budgetPenalty = Math.abs(500 - totalAllocated) * 0.2;
-
-    let finalScore = Math.max(0, Math.round(s1 + s2 + s3 + s4 - budgetPenalty));
-
-    let grade = "F";
-    if (finalScore >= 95) grade = "S (Optimal)";
-    else if (finalScore >= 85) grade = "A";
-    else if (finalScore >= 75) grade = "B";
-    else if (finalScore >= 65) grade = "C";
-    else if (finalScore >= 50) grade = "D";
-
-    // Dynamic Secondary Metrics
-    const erWait = Math.max(1.8, (8.5 - (postEr * 0.02) - (complex * 0.018)).toFixed(1));
-    const alcBeds = Math.max(3.5, (22.0 - (postEr * 0.09)).toFixed(1));
-    const burnout = Math.max(22.0, (78.0 - (doctor * 0.22)).toFixed(1));
-
-    // Auditor text generator
-    let auditMessage = "";
-    if (postEr < 120) {
-      auditMessage = "Severe bottleneck detected in hospital beds due to underfunding post-acute and LTC facilities. Patients remain blocked in ER beds.";
-    } else if (hospital > 150) {
-      auditMessage = "Over-investment in acute hospital space created high physical maintenance costs without addressing root-cause ER entry factors.";
-    } else if (finalScore >= 90) {
-      auditMessage = "Exceptional balance! Funding post-acute facilities unblocked hospital beds, while community care suppressed high-utilizer ER visits.";
-    } else {
-      auditMessage = "Moderate efficiency. Reallocating funding from physical hospital beds into post-ER discharge options will yield better system flow.";
+    function toggleBenchmark() {
+      const box = document.getElementById('benchmarkBox');
+      box.classList.toggle('hidden');
     }
 
-    document.getElementById('resGroupName').innerText = "Auditor General Report: " + groupName;
-    document.getElementById('resScore').innerText = finalScore;
-    document.getElementById('resGrade').innerText = "Grade: " + grade;
-    document.getElementById('resErWait').innerText = erWait + " hrs";
-    document.getElementById('resAlc').innerText = alcBeds + "%";
-    document.getElementById('resBurnout').innerText = burnout + "%";
-    document.getElementById('resAuditText').innerText = auditMessage;
+    function runSimulation() {
+      const groupName = document.getElementById('groupName').value || "Group";
+      const postEr = parseInt(document.getElementById('postEr').value) || 0;
+      const complex = parseInt(document.getElementById('complex').value) || 0;
+      const doctor = parseInt(document.getElementById('doctor').value) || 0;
+      const hospital = parseInt(document.getElementById('hospital').value) || 0;
 
-    document.getElementById('inputForm').style.display = 'none';
-    document.getElementById('resultsCard').style.display = 'block';
-  }
+      // Scoring math normalized to 100 points max based on optimal benchmark targets
+      const s1 = Math.min(35, (postEr / 175) * 35);
+      const s2 = Math.min(25, (complex / 125) * 25);
+      const s3 = Math.min(25, (doctor / 125) * 25);
+      const s4 = Math.min(15, (hospital / 75) * 15);
 
-  function resetForm() {
-    document.getElementById('resultsCard').style.display = 'none';
-    document.getElementById('inputForm').style.display = 'block';
-  }
-</script>
+      const totalAllocated = postEr + complex + doctor + hospital;
+      const budgetPenalty = Math.abs(500 - totalAllocated) * 0.25;
+
+      let finalScore = Math.max(0, Math.round(s1 + s2 + s3 + s4 - budgetPenalty));
+
+      let grade = "F";
+      if (finalScore >= 95) grade = "S (Optimal)";
+      else if (finalScore >= 85) grade = "A";
+      else if (finalScore >= 75) grade = "B";
+      else if (finalScore >= 65) grade = "C";
+      else if (finalScore >= 50) grade = "D";
+
+      const erWait = Math.max(1.8, (8.5 - (postEr * 0.02) - (complex * 0.018)).toFixed(1));
+      const alcBeds = Math.max(3.5, (22.0 - (postEr * 0.09)).toFixed(1));
+      const burnout = Math.max(22.0, (78.0 - (doctor * 0.22)).toFixed(1));
+
+      let auditMessage = "";
+      if (totalAllocated !== 500) {
+        auditMessage = `Budget Mismatch Warning: The total budget allocated was $${totalAllocated}B CAD instead of the $500B mandate. A penalty was applied.`;
+      } else if (postEr < 120) {
+        auditMessage = "System Bottleneck Detected: Critical underfunding of post-acute and LTC beds left hospital corridors clogged with ALC patients, preventing ER flow regardless of acute spending.";
+      } else if (hospital > 150) {
+        auditMessage = "Acute Over-Expansion: Excessive capital allocated to physical hospital space created high fixed maintenance costs without addressing the root causes driving emergency admissions.";
+      } else if (finalScore >= 90) {
+        auditMessage = "Exceptional Strategic Efficiency! Prioritizing post-ER care resolved hospital bed-blocking while community complex care successfully deflected high-utilizer emergency visits.";
+      } else {
+        auditMessage = "Moderate Performance: Reallocating spending from acute bed construction toward post-ER discharge options and primary care will improve overall throughput.";
+      }
+
+      document.getElementById('resGroupName').innerText = "Auditor General Report: " + groupName;
+      document.getElementById('resScore').innerText = finalScore;
+      document.getElementById('resGrade').innerText = "Grade: " + grade;
+      document.getElementById('resErWait').innerText = erWait + " hrs";
+      document.getElementById('resAlc').innerText = alcBeds + "%";
+      document.getElementById('resBurnout').innerText = burnout + "%";
+      document.getElementById('resAuditText').innerText = auditMessage;
+
+      document.getElementById('inputForm').classList.add('hidden');
+      document.getElementById('resultsCard').classList.remove('hidden');
+    }
+
+    function resetForm() {
+      document.getElementById('resultsCard').classList.add('hidden');
+      document.getElementById('inputForm').classList.remove('hidden');
+    }
+
+    // Initialize initial zero state
+    updateBudget();
+  </script>
 
 </body>
 </html>
