@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ER Wait Times Policy Challenge</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f1f2f3;--card:#fff;--ink:#333;--navy:#26374a;--link:#284162;--red:#af3c43;--line:#d6d6d6;--mute:#6b7280;--ok:#278400}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15202b;--card:#1e2b39;--ink:#e6e9ee;--link:#9bb8e0;--line:#364659;--mute:#9aa7b6}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans",Helvetica,Arial,sans-serif;line-height:1.5}
+.top{background:var(--card);border-bottom:1px solid var(--line)}
+.top .in{max-width:1100px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:10px;font-weight:700;color:var(--navy)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .top .in{color:#fff}}
+.flagbar{height:6px;background:linear-gradient(90deg,var(--red) 0 25%,#fff 25% 75%,var(--red) 75%)}
+.hero{background:var(--navy);color:#fff;border-bottom:4px solid var(--red)}
+.hero .in{max-width:1100px;margin:auto;padding:22px 16px}
+.hero h1{margin:0;font-size:clamp(1.4rem,4vw,2rem)}.hero p{margin:6px 0 0;opacity:.85}
+main{max-width:1100px;margin:auto;padding:18px 16px 40px;display:grid;grid-template-columns:1fr 320px;gap:18px}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--navy);border-radius:4px;padding:16px;margin-bottom:16px}
+h2{margin:0 0 10px;font-size:1.2rem;color:var(--navy)}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) h2{color:#fff}}
+label.t{font-weight:700;display:block;margin-bottom:4px}
+input[type=text]{width:100%;padding:10px;border:2px solid var(--navy);border-radius:4px;font-size:1rem;background:var(--card);color:var(--ink)}
+.cat{padding:12px 0;border-top:1px solid var(--line)}
+.cat .h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:700}
+.cat small{color:var(--mute);display:block}
+.val{color:var(--red);white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--red);height:28px}
+.bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg);padding:10px 12px;border-radius:4px;margin:8px 0;font-weight:700}
+.btn{background:var(--link);color:#fff;border:0;border-radius:4px;padding:11px 20px;font-size:1rem;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--navy)}.btn:disabled{background:#9aa3ad;cursor:not-allowed}.btn.red{background:var(--red)}
+.msg{color:var(--red);font-weight:700;min-height:1.4em}
+.score{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.big{font-size:3.2rem;font-weight:800;color:var(--navy);line-height:1}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .big{color:#fff}}
+.grade{font-size:2.4rem;font-weight:800;background:var(--red);color:#fff;border-radius:6px;padding:2px 16px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}th{color:var(--mute);font-weight:700}
+td.n,th.n{text-align:right}
+.chart{overflow-x:auto}svg{max-width:100%;height:auto}
+.sb{background:var(--line);height:8px;border-radius:4px;overflow:hidden}.sb i{display:block;height:100%;background:var(--link)}
+.hidden{display:none}
+#win{position:fixed;inset:0;z-index:10;background:radial-gradient(circle,#3a5070,#15202b);color:#fff;text-align:center;overflow:auto;padding:calc(24px + env(safe-area-inset-top,0px)) 16px 24px}
+#win canvas{position:fixed;inset:0;pointer-events:none}
+#win .w{position:relative;max-width:640px;margin:auto}
+.spin{perspective:700px;margin:18px 0}
+.spin span{display:inline-block;font-size:clamp(2rem,9vw,4rem);font-weight:800;color:#ffd84d;text-shadow:0 3px 12px #0008}
+#win .card{color:var(--ink);text-align:left;margin-top:16px}
+footer{text-align:center;color:var(--mute);font-size:.8rem;padding-bottom:20px}
+</style>
+</head>
+<body>
+<div class="flagbar"></div>
+<div class="top"><div class="in"><span style="font-size:1.4rem">🍁</span> Health Policy Simulation Office &middot; Canada</div></div>
+<div class="hero"><div class="in"><h1>Reducing Hospital Wait Times: National Investment Challenge</h1>
+<p>Allocate a $500 billion, 10-year budget across four priorities. The team with the highest score wins.</p></div></div>
+
+<main>
+<div>
+ <section id="setup" class="card">
+  <h2 id="tt">Team 1 of 4</h2>
+  <label class="t" for="team">Team name</label>
+  <input type="text" id="team" maxlength="28" placeholder="Enter your team name">
+  <div id="cats" style="margin-top:14px"></div>
+  <div class="bar"><span>Allocated: <span id="alloc">$0B</span></span><span>Remaining: <span id="rem" class="val">$500B (100%)</span></span></div>
+  <div class="msg" id="msg"></div>
+  <button class="btn" id="go">Run 10-Year Simulation</button>
+ </section>
+
+ <section id="result" class="card hidden">
+  <h2 id="rt"></h2>
+  <div class="score"><div class="big" id="rs"></div><div class="grade" id="rg"></div><div style="flex:1;min-width:180px" id="rsum"></div></div>
+  <h2 style="margin-top:18px">Average ER wait time index (Year 0 = 100)</h2>
+  <div class="chart" id="chart"></div>
+  <div id="rb"></div>
+  <p style="margin-top:14px"><button class="btn" id="next">Next team</button></p>
+ </section>
+</div>
+
+<aside>
+ <div class="card"><h2>Leaderboard</h2>
+  <table><thead><tr><th>#</th><th>Team</th><th class="n">Score</th><th class="n">Grade</th></tr></thead><tbody id="lb"><tr><td colspan="4" style="color:var(--mute)">No submissions yet</td></tr></tbody></table>
+  <p style="margin:12px 0 0"><button class="btn" id="reset" style="background:#6b7280;padding:7px 12px;font-size:.85rem">Reset activity</button></p>
+ </div>
+ <div class="card"><h2>How scoring works</h2>
+  <p style="margin:0;font-size:.9rem">Spending has diminishing returns, each priority affects wait times differently, and some take longer to pay off. Your score (out of 100) reflects how much your choices cut ER wait times by Year 10.</p></div>
+</aside>
+</main>
+<footer>Classroom simulation &mdash; fictional model for educational use only.</footer>
+
+<div id="win" class="hidden"><canvas id="cf"></canvas>
+ <div class="w"><div style="letter-spacing:.2em;font-weight:700">🏆 WINNER 🏆</div>
+  <div class="spin"><span id="wn"></span></div>
+  <div style="font-size:1.4rem" id="ws"></div>
+  <div class="card"><h2>Final standings</h2><table><tbody id="wlb"></tbody></table></div>
+  <p><button class="btn red" id="opt">Show optimal strategy</button></p>
+  <div class="card hidden" id="optc"></div>
+  <p><button class="btn" id="again" style="background:#fff;color:var(--navy)">Start new activity</button></p>
+ </div></div>
+
+<script>
+const BUDGET=500,STEP=5,N=4;
+const CATS=[
+ {n:'Doctor Shortage',d:'Recruit, train and retain physicians and nurses',w:.28,k:110,tau:4},
+ {n:'Lack of Hospital Space',d:'Build beds, expand ERs and add surge capacity',w:.22,k:90,tau:3},
+ {n:'Medically Complex Patient Care',d:'Manage high-acuity patients you can\u2019t control the arrival of',w:.12,k:60,tau:2},
+ {n:'Post-ER Care & ALC Discharge Facilities',d:'Home care, rehab and long-term care so patients can leave hospital',w:.38,k:80,tau:1.5}];
+const $=id=>document.getElementById(id);
+let teams=[],x=[0,0,0,0];
+try{teams=JSON.parse(localStorage.getItem('erteams')||'[]')}catch(e){}
+const save=()=>{try{localStorage.setItem('erteams',JSON.stringify(teams))}catch(e){}};
+const fm=v=>'$'+v+'B',pc=v=>Math.round(v/BUDGET*100)+'%';
+function grade(s){return s>=90?'A+':s>=85?'A':s>=80?'A-':s>=77?'B+':s>=73?'B':s>=70?'B-':s>=67?'C+':s>=63?'C':s>=60?'C-':s>=50?'D':'F'}
+function sim(a){
+ const rel=a.map((v,i)=>1-Math.exp(-v/CATS[i].k)),S=rel.reduce((s,r,i)=>s+r*CATS[i].w,0);
+ const score=Math.min(100,100*Math.pow(S/.8,4)),yrs=[];
+ for(let t=0;t<=10;t++){
+  const St=rel.reduce((s,r,i)=>{const c=CATS[i],ramp=(1-Math.exp(-t/c.tau))/(1-Math.exp(-10/c.tau));return s+r*c.w*ramp},0);
+  yrs.push({base:100*Math.pow(1.05,t),wait:100*Math.pow(1.05,t)*(1-.6*St)});}
+ return{score:Math.round(score*10)/10,grade:grade(score),rel,yrs};}
+function buildSliders(){
+ $('cats').innerHTML=CATS.map((c,i)=>`<div class="cat"><div class="h"><span>${c.n}<small>${c.d}</small></span><span class="val" id="v${i}"></span></div>
+ <input type="range" id="s${i}" min="0" max="${BUDGET}" step="${STEP}" value="0" aria-label="${c.n}"></div>`).join('');
+ CATS.forEach((c,i)=>$('s'+i).addEventListener('input',e=>{
+  const o=x.reduce((s,v,j)=>j==i?s:s+v,0);let v=+e.target.value;if(v>BUDGET-o)v=BUDGET-o;e.target.value=v;x[i]=v;upd();}));}
+function upd(){
+ const tot=x.reduce((a,b)=>a+b,0);
+ x.forEach((v,i)=>$('v'+i).textContent=fm(v)+' \u00b7 '+pc(v));
+ $('alloc').textContent=fm(tot)+' ('+pc(tot)+')';$('rem').textContent=fm(BUDGET-tot)+' ('+pc(BUDGET-tot)+')';}
+function startTeam(){
+ x=[0,0,0,0];$('team').value='';$('msg').textContent='';
+ CATS.forEach((c,i)=>$('s'+i).value=0);upd();
+ $('tt').textContent='Team '+(teams.length+1)+' of '+N;
+ $('setup').classList.remove('hidden');$('result').classList.add('hidden');}
+function lb(){
+ const r=[...teams].sort((a,b)=>b.score-a.score);
+ $('lb').innerHTML=r.length?r.map((t,i)=>`<tr><td>${i+1}</td><td>${esc(t.name)}</td><td class="n">${t.score}</td><td class="n">${t.grade}</td></tr>`).join(''):'<tr><td colspan="4" style="color:var(--mute)">No submissions yet</td></tr>';}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function chart(y){
+ const W=620,H=270,L=46,R=14,T=14,B=34,all=y.flatMap(p=>[p.base,p.wait]),mn=Math.floor(Math.min(...all)/10)*10-5,mx=Math.ceil(Math.max(...all)/10)*10;
+ const X=t=>L+t*(W-L-R)/10,Y=v=>T+(mx-v)*(H-T-B)/(mx-mn),pts=k=>y.map((p,t)=>X(t)+','+Y(p[k])).join(' ');
+ let g='';for(let v=Math.ceil(mn/10)*10;v<=mx;v+=10)g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#8884" /><text x="${L-6}" y="${Y(v)+4}" font-size="11" text-anchor="end" fill="#888">${v}</text>`;
+ for(let t=0;t<=10;t++)g+=`<text x="${X(t)}" y="${H-14}" font-size="11" text-anchor="middle" fill="#888">${t}</text>`;
+ return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Wait time by year">${g}
+ <polyline points="${pts('base')}" fill="none" stroke="#888" stroke-width="2.5" stroke-dasharray="6 5"/>
+ <polyline points="${pts('wait')}" fill="none" stroke="#af3c43" stroke-width="3.5"/>
+ ${y.map((p,t)=>`<circle cx="${X(t)}" cy="${Y(p.wait)}" r="3.5" fill="#af3c43"/>`).join('')}
+ <text x="${W/2}" y="${H-1}" font-size="11" text-anchor="middle" fill="#888">Year</text></svg>
+ <div style="font-size:.85rem"><b style="color:#af3c43">&#9473;</b> Your policy &nbsp; <b style="color:#888">- - -</b> No investment (wait times keep growing)</div>`;}
+function showResult(t){
+ $('setup').classList.add('hidden');$('result').classList.remove('hidden');
+ $('rt').textContent=t.name+' \u2014 10-Year Results';$('rs').textContent=t.score+'/100';$('rg').textContent=t.grade;
+ const f=t.yrs[10];$('rsum').innerHTML=`Year 10 wait index: <b>${Math.round(f.wait)}</b> vs <b>${Math.round(f.base)}</b> with no action (${Math.round((1-f.wait/f.base)*100)}% shorter).`;
+ $('chart').innerHTML=chart(t.yrs);
+ $('rb').innerHTML='<table><thead><tr><th>Priority</th><th class="n">Funding</th><th>Effectiveness</th></tr></thead><tbody>'+CATS.map((c,i)=>`<tr><td>${c.n}</td><td class="n">${fm(t.x[i])} (${pc(t.x[i])})</td><td style="min-width:90px"><div class="sb"><i style="width:${Math.round(t.rel[i]*100)}%"></i></div></td></tr>`).join('')+'</tbody></table>';
+ $('next').textContent=teams.length>=N?'See the winner \uD83C\uDFC6':'Next team';
+ scrollTo({top:0,behavior:'smooth'});}
+$('go').onclick=()=>{
+ const name=$('team').value.trim(),tot=x.reduce((a,b)=>a+b,0);
+ if(!name){$('msg').textContent='Please enter a team name.';return}
+ if(tot!==BUDGET){$('msg').textContent='Allocate the full $500B before submitting ('+fm(BUDGET-tot)+' remaining).';return}
+ const r=sim(x),t={name,x:[...x],...r};teams.push(t);save();lb();showResult(t);};
+$('next').onclick=()=>teams.length>=N?win():startTeam();
+let opt=null;
+function optimal(){
+ if(opt)return opt;let best=-1,bx;const u=BUDGET/STEP;
+ for(let a=0;a<=u;a++)for(let b=0;a+b<=u;b++)for(let c=0;a+b+c<=u;c++){const y=[a*STEP,b*STEP,c*STEP,(u-a-b-c)*STEP];
+  const S=y.reduce((s,v,i)=>s+CATS[i].w*(1-Math.exp(-v/CATS[i].k)),0);if(S>best){best=S;bx=y}}
+ return opt={x:bx,...sim(bx)};}
+function win(){
+ const r=[...teams].sort((a,b)=>b.score-a.score),w=r[0];
+ $('wn').textContent=w.name;$('ws').textContent=w.score+'/100 \u00b7 Grade '+w.grade;
+ $('wlb').innerHTML=r.map((t,i)=>`<tr><td>${i+1}</td><td>${esc(t.name)}</td><td class="n">${t.score} (${t.grade})</td></tr>`).join('');
+ $('optc').classList.add('hidden');$('win').classList.remove('hidden');$('win').scrollTop=0;confetti();}
+$('opt').onclick=()=>{const o=optimal();
+ $('optc').innerHTML='<h2>Optimal strategy</h2><table><tbody>'+CATS.map((c,i)=>`<tr><td>${c.n}</td><td class="n">${fm(o.x[i])} (${pc(o.x[i])})</td></tr>`).join('')+`</tbody></table><p style="margin:10px 0 0"><b>Best possible score: ${o.score}/100 (${o.grade})</b></p>`;
+ $('optc').classList.remove('hidden');$('optc').scrollIntoView({behavior:'smooth'});};
+function reset(){teams=[];save();lb();$('win').classList.add('hidden');startTeam();}
+$('reset').onclick=()=>{if(confirm('Clear all teams and start over?'))reset()};
+$('again').onclick=reset;
+let raf;function confetti(){
+ const c=$('cf'),g=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;cancelAnimationFrame(raf);
+ const cols=['#af3c43','#fff','#ffd84d','#6fa8ff','#ff7b7b'],p=Array.from({length:180},()=>({x:Math.random()*c.width,y:-Math.random()*c.height,s:5+Math.random()*7,v:2+Math.random()*4,a:Math.random()*6,r:Math.random()*.2-.1,c:cols[Math.random()*5|0]}));
+ (function f(){g.clearRect(0,0,c.width,c.height);p.forEach(q=>{q.y+=q.v;q.a+=q.r;q.x+=Math.sin(q.a)*1.5;if(q.y>c.height){q.y=-10;q.x=Math.random()*c.width}
+  g.save();g.translate(q.x,q.y);g.rotate(q.a*3);g.fillStyle=q.c;g.fillRect(-q.s/2,-q.s/4,q.s,q.s/2);g.restore()});
+  if(!$('win').classList.contains('hidden'))raf=requestAnimationFrame(f)})();}
+buildSliders();lb();startTeam();
+if(teams.length>=N)win();
+</script>
+</body>
+</html>
